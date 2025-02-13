@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template
-import numpy as np
 import joblib
-import tensorflow as tf
+import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from flask_cors import CORS
 import sqlite3 
@@ -11,13 +10,10 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return render_template('front.html') 
+    return render_template('front.html')
 
-# Load the trained model and scaler
-model = tf.keras.models.load_model('model.h5')  # Correct way to load a Keras model
-scaler = joblib.load('scaler.joblib')  # Load the scaler
+model = joblib.load('model.joblib')
 
-# Encoding categorical values
 tcp_flags_encoder = LabelEncoder()
 protocol_encoder = LabelEncoder()
 l7_proto_encoder = LabelEncoder()
@@ -38,11 +34,9 @@ def analyze():
 
         print(f"Received data: {data}")
 
-        # Convert to numeric values
         L4_SRC_PORT = int(L4_SRC_PORT)
         L4_DST_PORT = int(L4_DST_PORT)
 
-        # Encode categorical variables
         protocol_list = PROTOCOL.split('+')
         L7_proto_list = L7_PROTO.split('+')
 
@@ -51,35 +45,33 @@ def analyze():
 
         TCP_FLAGS = tcp_flags_encoder.transform([TCP_FLAGS])[0]
 
-        # Prepare input features
-        input_features = np.array([[L4_SRC_PORT, L4_DST_PORT, TCP_FLAGS, protocol_sum, L7_proto_sum]])
+        input_features = np.array([L4_SRC_PORT, L4_DST_PORT, TCP_FLAGS, protocol_sum, L7_proto_sum]).reshape(1, -1)
 
-        # Scale features (important step!)
-        input_features = scaler.transform(input_features)
+        input_features = input_features.astype(np.float32)
 
-        # Predict
         prediction = model.predict(input_features)
-        prediction_probability = float(prediction[0][0])  # Ensure it's a float
 
-        # Convert to class label
-        predicted_class = 1 if prediction_probability > 0.5 else 0
+        prediction_probability = prediction[0][0].item()
+        
+        predicted_class = 1 if (prediction_probability)> 0.5 else 0
 
         return jsonify({
             'prediction': int(predicted_class),
-            'prediction_probability': round(prediction_probability, 4),  # Keep it readable
+            'prediction_probability': round(float(prediction_probability),2),
             'protocol_combination_sum': f"Sum of Protocols: {protocol_sum} + {L7_proto_sum}"  
         })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-# Function to check if an IP is blocked
+
 def check_ip_in_db(ip_address):
     """Check if an IP is present in the database"""
     conn = sqlite3.connect("network_security.db")
     cursor = conn.cursor()
+
     cursor.execute("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?", (ip_address,))
-    result = cursor.fetchone()[0]
+    result = cursor.fetchone()[0]  
     conn.close()
     return result > 0  
 
