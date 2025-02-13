@@ -33,4 +33,4 @@ model.fit(X_train, y_train, epochs=10,batch_size=128, validation_split=0.2)
 y_pred = model.predict(X_test)
 y_pred = (y_pred > 0.5)
 
-joblib.dump(model,'model.joblib', compress=3)
+joblib.dump(model,'model.joblib', compress=9)
