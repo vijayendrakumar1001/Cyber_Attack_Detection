@@ -1,13 +1,10 @@
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_classification
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, classification_report
 import joblib
 import pandas as pd
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
 
 data = pd.read_csv('datasetforproject_UPDATED.csv')
 features = ['L4_SRC_PORT', 'TCP_FLAGS', 'L4_DST_PORT', 'PROTOCOL', 'L7_PROTO']
@@ -17,20 +14,21 @@ X = data[features]
 y = data[target]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+svm = LinearSVC(C=0.00001, max_iter=1000, penalty='l2', dual=False, tol=1e-1, intercept_scaling=0.1)
+svm.fit(X_train, y_train)
 
-model = Sequential()
-model.add(Dense(units=4, activation='relu', input_dim=X_train.shape[1]))
-model.add(Dense(units=1, activation='sigmoid'))
+y_pred = svm.predict(X_test)
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, epochs=10,batch_size=128, validation_split=0.2)
-y_pred = model.predict(X_test)
-y_pred = (y_pred > 0.5)
-
-joblib.dump(model,'model.joblib',compress=9)
+joblib.dump(svm,'model.joblib',compress=9)

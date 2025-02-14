@@ -56,9 +56,9 @@ def analyze():
         predicted_class = 1 if (prediction_probability)> 0.5 else 0
 
         return jsonify({
-            'prediction': int(predicted_class),
-            'prediction_probability': round(float(prediction_probability),2),
-            'protocol_combination_sum': f"Sum of Protocols: {protocol_sum} + {L7_proto_sum}"  
+            'prediction': predicted_class,
+            'prediction_probability': prediction_probability,
+            'protocol_combination_sum': f"Sum of Protocols: {protocol_sum} + {L7_proto_sum}"
         })
 
     except Exception as e:
