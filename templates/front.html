@@ -263,7 +263,7 @@
             L7_PROTO: l7Proto
         };
 
-        fetch('http://127.0.0.1:5000/check_ip', {
+        fetch('http://127.0.0.1:5000/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(inputData)
