@@ -30,5 +30,4 @@ svm.fit(X_train, y_train)
 
 y_pred = svm.predict(X_test)
 
-
-joblib.dump(svm,'model.joblib',compress=9)
+joblib.dump({'model': svm, 'scaler': scaler}, 'model.joblib')

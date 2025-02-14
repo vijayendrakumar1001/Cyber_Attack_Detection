@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 import joblib
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from flask_cors import CORS
-import sqlite3 
+import sqlite3
 
 app = Flask(__name__)
 CORS(app)
@@ -12,8 +12,12 @@ CORS(app)
 def home():
     return render_template('front.html')
 
-model = joblib.load('model.joblib')
+# Load model and scaler
+model_data = joblib.load('model.joblib')
+model = model_data['model']
+scaler = model_data['scaler']
 
+# Define encoders
 tcp_flags_encoder = LabelEncoder()
 protocol_encoder = LabelEncoder()
 l7_proto_encoder = LabelEncoder()
@@ -34,36 +38,47 @@ def analyze():
 
         print(f"Received data: {data}")
 
+        # Convert to integer
         L4_SRC_PORT = int(L4_SRC_PORT)
         L4_DST_PORT = int(L4_DST_PORT)
 
+        # Encode protocol and L7 protocol safely
         protocol_list = PROTOCOL.split('+')
         L7_proto_list = L7_PROTO.split('+')
 
-        protocol_sum = sum(protocol_encoder.transform([protocol])[0] for protocol in protocol_list)
-        L7_proto_sum = sum(l7_proto_encoder.transform([proto])[0] for proto in L7_proto_list)
+        try:
+            protocol_sum = sum(protocol_encoder.transform([protocol])[0] for protocol in protocol_list)
+        except ValueError:
+            protocol_sum = -1  # Handle unknown protocols
 
-        TCP_FLAGS = tcp_flags_encoder.transform([TCP_FLAGS])[0]
+        try:
+            L7_proto_sum = sum(l7_proto_encoder.transform([proto])[0] for proto in L7_proto_list)
+        except ValueError:
+            L7_proto_sum = -1  # Handle unknown L7 protocols
 
-        input_features = np.array([L4_SRC_PORT, L4_DST_PORT, TCP_FLAGS, protocol_sum, L7_proto_sum]).reshape(1, -1)
+        # Encode TCP_FLAGS safely
+        try:
+            TCP_FLAGS = tcp_flags_encoder.transform([TCP_FLAGS])[0]
+        except ValueError:
+            TCP_FLAGS = -1
 
-        input_features = input_features.astype(np.float32)
+        # Create input array
+        input_features = np.array([[L4_SRC_PORT, L4_DST_PORT, TCP_FLAGS, protocol_sum, L7_proto_sum]])
 
+        # Scale input
+        input_features = scaler.transform(input_features)
+
+        # Make prediction
         prediction = model.predict(input_features)
-
-        prediction_probability = prediction[0][0].item()
-        
-        predicted_class = 1 if (prediction_probability)> 0.5 else 0
+        predicted_class = int(prediction[0])  # Ensure integer response
 
         return jsonify({
             'prediction': predicted_class,
-            'prediction_probability': prediction_probability,
             'protocol_combination_sum': f"Sum of Protocols: {protocol_sum} + {L7_proto_sum}"
         })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
 
 def check_ip_in_db(ip_address):
     """Check if an IP is present in the database"""
@@ -71,7 +86,7 @@ def check_ip_in_db(ip_address):
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM blocked_ips WHERE ip_address = ?", (ip_address,))
-    result = cursor.fetchone()[0]  
+    result = cursor.fetchone()[0]
     conn.close()
     return result > 0  
 
