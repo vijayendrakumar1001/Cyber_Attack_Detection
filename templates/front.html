@@ -3,322 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Threat Detection</title>
+    <title>Cyber Threat Scanner</title>
     <style>
- 
-        body {
-            font-family: 'Arial', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #0a0a0a;
-            color: #fff;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        body::before {
-            content: "";
+        body {
+            background: #000;
+            color: orange;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        .navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px 0;
+            background: rgba(234, 180, 4, 0.822);
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('/static/images/1721806391-6188.webp') no-repeat center center/cover;
-            opacity: 0.2;
-            z-index: -1;
+            z-index: 1000;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .navbar a {
+            color: orange;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+            cursor: pointer;
         }
 
+        .navbar a:hover {
+            border-bottom: 2px solid orange;
+        }
 
-        .centered {
-            display: flex;
-            flex-direction: column;
+        section {
+            height: 100vh;
+            display: none;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            text-align: center;
-            animation: fadeIn 1s ease-in-out;
+            flex-direction: column;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            color: #00ffcc;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-            margin-bottom: 20px;
+        #home {
+            display: flex;
+            background: url('https://source.unsplash.com/1600x900/?cybersecurity,hacking') no-repeat center center/cover;
         }
 
-        .btn {
-            background: #00ffcc;
-            color: #121212;
-            font-size: 16px;
-            padding: 12px 25px;
-            margin-top: 25px;
+        .input-container {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field {
+            margin: 10px 0;
+            padding: 12px;
             border: none;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.3s ease-in-out;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            background: #00cc99;
-            transform: scale(1.05);
-        }
-
-        .container {
-            max-width: 450px;
-            margin: 50px auto;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(0px);
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
-            text-align: center;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        label {
-            display: block;
-            font-size: 16px;
-            margin: 10px 0 5px;
-            font-weight: bold;
-            text-align: left;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            background-color: #222;
+            border-bottom: 2px solid orange;
+            background: transparent;
             color: #fff;
             font-size: 16px;
             outline: none;
-            transition: box-shadow 0.3s ease-in-out;
+            text-align: center;
         }
 
-        input:focus {
-            box-shadow: 0 0 8px rgba(0, 255, 153, 0.5);
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: 2px solid orange;
+            color: orange;
+            background: transparent;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
+        .btn:hover {
+            background: orange;
+            color: #000;
+        }
 
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #222;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000;
             padding: 25px;
-            border-radius: 10px;
+            border: 2px solid orange;
             text-align: center;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(0, 255, 153, 0.3);
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .href {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            text-decoration: none;
-            color: #00ffcc;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease-in-out;
-        }
-
-        .href:hover {
-            color: #00cc99;
-        }
-
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
-            }
         }
     </style>
 </head>
 <body>
 
-<!-- Landing Page -->
-<div id="landingPage" class="centered">
-    <h1>Cyber Threat Detection</h1>
-    <button class="btn" onclick="goToForm()">Analyze Network Threats</button>
-</div>
+    <div class="navbar">
+        <a onclick="showPage('home')">🏠 Home</a>
+        <a onclick="showPage('scan')">🛡 Scan Threats</a>
+        <a onclick="showPage('ipCheck')">🔍 IP Checker</a>
+    </div>
 
-<!-- Form Page -->
-<div id="formPage" class="container hidden">
-    <h1>Enter Network Data</h1>
-    <form id="anomalyForm" onsubmit="handleFormSubmit(event)">
-        <label for="srcPort">L4 Source Port</label>
-        <input type="number" id="srcPort" required>
+    <section id="home">
+        <h1>Cyber Threat Scanner</h1>
+        <p>Analyze threats & detect malicious activities instantly.</p>
+        <button class="btn" onclick="showPage('scan')">Start Scan</button>
+    </section>
 
-        <label for="dstPort">L4 Destination Port</label>
-        <input type="number" id="dstPort" required>
+    <section id="scan">
+        <h1>Check for Anomaly</h1>
+        <div class="input-container">
+            <input type="number" class="input-field" id="srcPort" placeholder="L4 Source Port">
+            <input type="number" class="input-field" id="dstPort" placeholder="L4 Destination Port">
+            <input type="text" class="input-field" id="tcpFlags" placeholder="TCP Flags">
+            <input type="text" class="input-field" id="protocol" placeholder="Protocol">
+            <input type="text" class="input-field" id="l7Proto" placeholder="L7 Protocol">
+            <button class="btn" onclick="handleFormSubmit(event)">Analyze</button>
+        </div>
+    </section>
 
-        <label for="tcpFlags">TCP Flags</label>
-        <input type="text" id="tcpFlags" required>
+    <section id="ipCheck">
+        <h1>Check Suspicious IP</h1>
+        <div class="input-container">
+            <input type="text" class="input-field" id="ipAddress" placeholder="Enter IP Address">
+            <button class="btn" onclick="handleIpCheck(event)">Check IP</button>
+        </div>
+    </section>
 
-        <label for="protocol">Protocol</label>
-        <input type="text" id="protocol" required>
-
-        <label for="l7Proto">L7 Protocol</label>
-        <input type="text" id="l7Proto" required>
-
-        <button class="btn" type="submit">Analyze</button>
-    </form>
-    <a class="href" onclick="goToip()">Check Blocked IP</a>
-    <p id="error" style="color: red;"></p>
-</div>
-
-<!-- IP Check Page -->
-<div id="ipPage" class="container hidden">
-    <h1>Check Blocked IP</h1>
-    <form id="blockIpForm" onsubmit="handleIpCheck(event)">
-        <label for="ipAddress">Enter IP Address</label>
-        <input type="text" id="ipAddress" required>
-        <button class="btn" type="submit">Check IP</button>
-    </form>
-    <a class="href" onclick="gotofront()">Go Back</a>
-</div>
-
-<!-- Result Modal -->
-<div id="resultModal" class="modal">
-    <div class="modal-content">
+    <div id="resultModal" class="modal">
         <h2 id="predictionResult"></h2>
-        <button class="btn" onclick="closeModal()">OK</button>
+        <button class="btn" onclick="closeModal()">Close</button></div>
     </div>
-</div>
-<!-- IP Result Modal -->
-<div id="ipResultModal" class="modal">
-    <div class="modal-content">
+
+    <div id="ipResultModal" class="modal">
         <h2 id="ipCheckResult"></h2>
-        <button class="btn" onclick="closeipresult()">OK</button>
+        <button class="btn" onclick="closeipresult()">Close</button>
     </div>
-</div>
 
-<script>
-   window.onpopstate = function(event) {
-        if (event.state && event.state.page === "form") {
-            goToForm();
-        } else if (event.state && event.state.page === "landing") {
-            goBackToLanding();
-        } else {
-            goBackToLanding();
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('section').forEach(section => section.style.display = 'none');
+            document.getElementById(pageId).style.display = 'flex';
         }
-    };
 
-    function goToForm() {
-        document.getElementById('landingPage').classList.add('hidden');
-        document.getElementById('formPage').classList.remove('hidden');
-        history.pushState({ page: "form" }, "", window.location.href);
-    }
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const inputData = {
+                L4_SRC_PORT: document.getElementById('srcPort').value,
+                L4_DST_PORT: document.getElementById('dstPort').value,
+                TCP_FLAGS: document.getElementById('tcpFlags').value,
+                PROTOCOL: document.getElementById('protocol').value,
+                L7_PROTO: document.getElementById('l7Proto').value
+            };
 
+            fetch('http://127.0.0.1:5000/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(inputData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('predictionResult').innerText = data.prediction === 0 ? 'Safe' : 'Threat Detected!';
+                document.getElementById('resultModal').style.display = 'flex';
+            });
+        }
 
-    function goBackToLanding() {
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('landingPage').classList.remove('hidden');
-        history.pushState({ page: "landing" }, "", window.location.href);
-    }
-    function goToip() {
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('ipPage').classList.remove('hidden');
-        history.pushState({ page: "ip" }, "", window.location.href);
-    }
-    function gotofront() {
-        document.getElementById('ipPage').classList.add('hidden');
-        document.getElementById('formPage').classList.remove('hidden');
-        history.pushState({ page: "form" }, "", window.location.href);
-    }
+        function handleIpCheck(event) {
+            event.preventDefault();
+            const ipAddress = document.getElementById("ipAddress").value;
 
+            fetch("http://127.0.0.1:5000/check_ip", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ip_address: ipAddress })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("ipCheckResult").innerText = data.blocked ? `IP ${ipAddress} is BLOCKED! 🚨` : `IP ${ipAddress} is SAFE ✅`;
+                document.getElementById("ipResultModal").style.display = "flex";
+            });
+        }
 
-    function handleFormSubmit(event) {
-        event.preventDefault();
-        const srcPort = document.getElementById('srcPort').value;
-        const dstPort = document.getElementById('dstPort').value;
-        const tcpFlags = document.getElementById('tcpFlags').value;
-        const protocol = document.getElementById('protocol').value;
-        const l7Proto = document.getElementById('l7Proto').value;
+        function closeModal() {
+            document.getElementById("resultModal").style.display = "none";
+        }
 
-        const inputData = {
-            L4_SRC_PORT: srcPort,
-            L4_DST_PORT: dstPort,
-            TCP_FLAGS: tcpFlags,
-            PROTOCOL: protocol,
-            L7_PROTO: l7Proto
-        };
+        function closeipresult() {
+            document.getElementById("ipResultModal").style.display = "none";
+        }
 
-        fetch('http://127.0.0.1:5000/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(inputData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('predictionResult').innerText =  data.prediction === 0 ? 'You have been Safe' : 'BE SAFE you have been Attacked!';
-            document.getElementById('resultModal').style.display = 'flex';
-        })
-        
-    }
-
-    function closeModal() {
-        document.getElementById('resultModal').style.display = 'none';
-        clearInputs();
-    }
-    function closeipresult() {
-        document.getElementById('ipResultModal').style.display = 'none';
-        clearInputs();
-    }
-
-    function clearInputs() {
-        document.getElementById('srcPort').value = '';
-        document.getElementById('dstPort').value = '';
-        document.getElementById('tcpFlags').value = '';
-        document.getElementById('protocol').value = '';
-        document.getElementById('l7Proto').value = '';
-        document.getElementById('error').innerText = '';
-    }
-
-    function handleIpCheck(event) {
-        event.preventDefault();
-        const ipAddress = document.getElementById("ipAddress").value;
-
-        fetch("http://127.0.0.1:5000/check_ip", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ip_address: ipAddress })
-        })
-        .then(response => response.json())
-        .then(data => {
-            const resultText = data.blocked
-                ? `IP ${ipAddress} is BLOCKED! 🚨`
-                : `IP ${ipAddress} is SAFE ✅`;
-
-            document.getElementById("ipCheckResult").innerText = resultText;
-            document.getElementById("ipResultModal").style.display = "flex";
-        })
-        
-    }
-
-    function iptoip() {
-        document.getElementById("ipResultModal").style.display = "none";
-    }
-
-</script>
+        showPage('home');
+    </script>
 </body>
 </html>
