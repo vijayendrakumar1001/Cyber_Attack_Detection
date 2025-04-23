@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from flask_cors import CORS
 import sqlite3
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
