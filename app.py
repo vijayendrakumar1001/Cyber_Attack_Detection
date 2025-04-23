@@ -90,20 +90,16 @@ def check_ip_in_db(ip_address):
     conn.close()
     return result > 0  
 
-@app.route('/check_ip', methods=['POST'])
+ip_df = pd.read_csv("ips.csv") 
+blocked_ips = set(ip_df["IP Address"].astype(str)) 
+@app.route("/check_ip", methods=["POST"])
 def check_ip():
-    try:
-        data = request.get_json()
-        ip_address = data.get("ip_address")
+    data = request.get_json()
+    ip_address = data.get("ip_address", "").strip()
 
-        if not ip_address:
-            return jsonify({"error": "IP address is required"}), 400
-
-        is_blocked = check_ip_in_db(ip_address)
-        return jsonify({"blocked": is_blocked})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+    if ip_address in blocked_ips:
+        return jsonify({"blocked": True, "message": f"IP {ip_address} is BLOCKED 🚨"})
+    else:
+        return jsonify({"blocked": False, "message": f"IP {ip_address} is SAFE ✅"})
 if __name__ == '__main__':
     app.run(debug=True)
